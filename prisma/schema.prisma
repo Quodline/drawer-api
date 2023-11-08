@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  entities Entity[]
+}
+
+model Entity {
+  id                   Int            @id @default(autoincrement())
+  title                String
+  userId               Int
+  attributes           Attribute[]
+  user                 User           @relation(fields: [userId], references: [id])
+  relationships        Relationship[] @relation("firstEntity")
+  inverseRelationships Relationship[] @relation("relatedEntity")
+}
+
+model Attribute {
+  id       Int      @id @default(autoincrement())
+  name     String
+  type     DataType
+  entityId Int
+  entity   Entity   @relation(fields: [entityId], references: [id])
+}
+
+model Relationship {
+  id              Int          @id @default(autoincrement())
+  type            RelationType
+  firstEntityId   Int
+  relatedEntityId Int
+  firstEntity     Entity       @relation("firstEntity", fields: [firstEntityId], references: [id])
+  relatedEntity   Entity       @relation("relatedEntity", fields: [relatedEntityId], references: [id])
+}
+
+enum DataType {
+  BOOLEAN
+  CHAR
+  DATE
+  DECIMAL
+  GEOMETRY
+  INT
+  JSON
+  VARCHAR
+  TEXT
+  TIME
+  TIMESTAMP
+  UUID
+  ENUM
+}
+
+enum RelationType {
+  ONE_TO_ONE
+  ONE_TO_MANY
+  MANY_TO_ONE
+}
