@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
+  id       Int    @id @default(autoincrement())
+  email    String @unique
   password String
-  schemas  Schema[]
+
+  schemas Schema[]
 
   @@map("users")
 }
 
 model Schema {
-  id       Int      @id @default(autoincrement())
-  title    String
-  userId   Int
+  id     Int    @id @default(autoincrement())
+  title  String
+  userId Int
+
   entities Entity[]
   user     User     @relation(fields: [userId], references: [id])
 
@@ -27,9 +29,10 @@ model Schema {
 }
 
 model Entity {
-  id                   Int            @id @default(autoincrement())
-  title                String
-  schemaId             Int
+  id       Int    @id @default(autoincrement())
+  title    String
+  schemaId Int
+
   attributes           Attribute[]
   schema               Schema         @relation(fields: [schemaId], references: [id])
   relationships        Relationship[] @relation("firstEntity")
@@ -43,7 +46,8 @@ model Attribute {
   name     String
   type     DataType
   entityId Int
-  entity   Entity   @relation(fields: [entityId], references: [id])
+
+  entity Entity @relation(fields: [entityId], references: [id])
 
   @@map("attributes")
 }
@@ -53,8 +57,9 @@ model Relationship {
   type            RelationType
   firstEntityId   Int
   relatedEntityId Int
-  firstEntity     Entity       @relation("firstEntity", fields: [firstEntityId], references: [id])
-  relatedEntity   Entity       @relation("relatedEntity", fields: [relatedEntityId], references: [id])
+
+  firstEntity   Entity @relation("firstEntity", fields: [firstEntityId], references: [id])
+  relatedEntity Entity @relation("relatedEntity", fields: [relatedEntityId], references: [id])
 
   @@map("relationships")
 }
