@@ -11,17 +11,31 @@ model User {
   id       Int      @id @default(autoincrement())
   email    String   @unique
   password String
+  schemas  Schema[]
+
+  @@map("users")
+}
+
+model Schema {
+  id       Int      @id @default(autoincrement())
+  title    String
+  userId   Int
   entities Entity[]
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@map("schemas")
 }
 
 model Entity {
   id                   Int            @id @default(autoincrement())
   title                String
-  userId               Int
+  schemaId             Int
   attributes           Attribute[]
-  user                 User           @relation(fields: [userId], references: [id])
+  schema               Schema         @relation(fields: [schemaId], references: [id])
   relationships        Relationship[] @relation("firstEntity")
   inverseRelationships Relationship[] @relation("relatedEntity")
+
+  @@map("entities")
 }
 
 model Attribute {
@@ -30,6 +44,8 @@ model Attribute {
   type     DataType
   entityId Int
   entity   Entity   @relation(fields: [entityId], references: [id])
+
+  @@map("attributes")
 }
 
 model Relationship {
@@ -39,6 +55,8 @@ model Relationship {
   relatedEntityId Int
   firstEntity     Entity       @relation("firstEntity", fields: [firstEntityId], references: [id])
   relatedEntity   Entity       @relation("relatedEntity", fields: [relatedEntityId], references: [id])
+
+  @@map("relationships")
 }
 
 enum DataType {

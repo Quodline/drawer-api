@@ -7,10 +7,10 @@ import {
     Post,
     UseGuards,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { GetUser } from './decorator';
-import { User } from '@prisma/client';
 import { JwtGuard } from './guard';
 
 @Controller('auth')
@@ -25,16 +25,12 @@ export class AuthController {
 
     @Post('signup')
     async signup(@Body() dto: AuthDto) {
-        return {
-            access_token: await this.authService.signup(dto),
-        };
+        return { access_token: await this.authService.signup(dto) };
     }
 
     @HttpCode(HttpStatus.OK)
     @Post('signin')
     async signin(@Body() dto: AuthDto) {
-        return {
-            access_token: await this.authService.signin(dto),
-        };
+        return { access_token: await this.authService.signin(dto) };
     }
 }
