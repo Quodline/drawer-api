@@ -17,20 +17,25 @@ export class AuthService {
     async signup(dto: AuthDto) {
         try {
             const user = await this.createUser(dto);
+            const token = await this.signToken(user.id, user.email);
 
-            return this.signToken(user.id, user.email);
+            return { token };
         } catch (error) {
             this.throwCredentialsTaken(error);
         }
     }
 
     async signin({ email, password }: AuthDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email },
-        });
+        const result = await this.prisma.user.findUnique({ where: { email } });
 
-        if (user && (await argon.verify(user.password, password))) {
-            return this.signToken(user.id, user.email);
+        if (result) {
+            const { password: passwordHash, ...user } = result;
+
+            if (await argon.verify(passwordHash, password)) {
+                const token = await this.signToken(user.id, user.email);
+
+                return { ...user, token };
+            }
         }
 
         throw new ForbiddenException('Credentials incorrect');
@@ -54,14 +59,14 @@ export class AuthService {
         return this.jwt.signAsync(payload, options);
     }
 
-    private throwCredentialsTaken(e: Error) {
+    private throwCredentialsTaken(error: Error) {
         if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === 'P2002'
+            error instanceof Prisma.PrismaClientKnownRequestError &&
+            error.code === 'P2002'
         ) {
             throw new ForbiddenException('Credentials taken');
         }
 
-        throw e;
+        throw error;
     }
 }

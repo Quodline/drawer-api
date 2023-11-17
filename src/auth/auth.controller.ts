@@ -25,12 +25,12 @@ export class AuthController {
 
     @Post('signup')
     async signup(@Body() dto: AuthDto) {
-        return { access_token: await this.authService.signup(dto) };
+        return this.authService.signup(dto);
     }
 
     @HttpCode(HttpStatus.OK)
     @Post('signin')
     async signin(@Body() dto: AuthDto) {
-        return { access_token: await this.authService.signin(dto) };
+        return this.authService.signin(dto);
     }
 }
