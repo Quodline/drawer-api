@@ -16,10 +16,10 @@ export class AuthService {
 
     async signup(dto: AuthDto) {
         try {
-            const user = await this.createUser(dto);
-            const token = await this.signToken(user.id, user.email);
+            const { id, email } = await this.createUser(dto);
+            const token = await this.signToken(id, email);
 
-            return { token };
+            return { id, email, token };
         } catch (error) {
             this.throwCredentialsTaken(error);
         }
